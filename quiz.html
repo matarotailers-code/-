@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>米津玄師 英作文バトル！</title>
+    
+    <style>
+        /* 全体の設定 */
+        body {
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            
+            /* 【💡 米津玄師さん風背景のCSSを適用】 */
+            /* 背景を複数指定して、複雑なテクスチャ感を出す */
+            background-color: #0a0a0a; /* 基本の濃い黒 */
+            background-image: 
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4"><rect fill="%23111" width="1" height="1"/><rect fill="%23111" x="2" y="2" width="1" height="1"/><rect fill="%23222" x="1" y="1" width="1" height="1"/><rect fill="%23222" x="3" y="3" width="1" height="1"/></svg>'), /* 非常に細かいグリッド/ノイズ */
+                linear-gradient(to bottom, #1a1a1a, #050505), /* 上から下への暗いグラデーション */
+                radial-gradient(circle at center, rgba(0, 240, 255, 0.05) 0%, transparent 70%); /* 中心に淡いネオンブルーの光 */
+            background-size: 8px 8px, cover, cover; /* グリッドのサイズ、グラデーションは全体 */
+            background-blend-mode: overlay, normal, normal; /* 重ね方の指定 */
+
+            color: #e0e0e0;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            font-size: 1.6em;
+            letter-spacing: 1px;
+            min-height: 100vh; /* 画面いっぱいに背景が広がるように */
+            overflow-x: hidden; /* 横スクロールバーが出ないように */
+
+            /* オプション：わずかな背景アニメーション */
+            animation: backgroundShift 60s linear infinite alternate;
+        }
+
+        @keyframes backgroundShift {
+            0% {
+                background-position: 0% 0%, 0% 0%, center;
+            }
+            100% {
+                background-position: 100% 100%, 0% 0%, center;
+            }
+        }
+        /* 【↑↑↑ 背景CSS終わり ↑↑↑】 */
+
+        /* 見出しのデザイン */
+        h1 {
+            color: #00f0ff; /* エレクトリックブルー */
+            font-size: 3.5em;
+            text-shadow: 0 0 10px #00f0ff; /* ネオングロー */
+            border-bottom: 5px double #00f0ff;
+            padding-bottom: 10px;
+            display: inline-block;
+            margin-bottom: 40px;
+        }
+
+        /* 問題エリアのコンテナ */
+        #quiz-area, #result-area {
+            background-color: #1a1a1a;
+            padding: 35px;
+            border-radius: 10px;
+            border: 2px solid #00f0ff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.7);
+            max-width: 800px; /* 幅を広げる */
+            margin: 30px auto;
+        }
+
+        /* 問題文（Q1/10: ...） */
+        h2 {
+            color: #fffc00; /* ネオンイエロー */
+            font-size: 1.8em; /* 英作文なので少し小さく */
+            margin-bottom: 30px;
+            text-shadow: 0 0 5px rgba(255, 252, 0, 0.8);
+            line-height: 1.5; /* 行の高さを調整 */
+        }
+        
+        /* 問題の日本語ヒント */
+        .japanese-hint {
+            color: #ff5555; /* 赤色で強調 */
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px rgba(255, 85, 85, 0.8);
+        }
+
+        /* 入力ボックス（英作文用） */
+        #answer-input {
+            padding: 18px;
+            font-size: 1.5em; /* 英作文なので文字サイズを調整 */
+            width: 90%; 
+            height: 50px; /* 高さを確保 */
+            margin: 20px 0;
+            border: 3px solid #00f0ff;
+            border-radius: 5px;
+            background-color: #0a0a0a;
+            color: #fffc00;
+            text-align: left; /* 入力を左寄せに */
+            outline: none;
+            box-sizing: border-box;
+        }
+        
+        /* ボタンのデザイン */
+        button {
+            background-color: #00f0ff;
+            color: #1a1a1a;
+            padding: 18px 35px;
+            font-size: 1.5em; 
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+            margin-top: 15px;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
+        button:hover {
+            background-color: #55ffff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 1);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <audio id="background-music" src="music/Meta_Universe.mp3" loop></audio>
+    <audio id="correct-sound" src="music/correct.mp3"></audio>
+    <audio id="incorrect-sound" src="music/incorrect.mp3"></audio>
+
+    <h1>🔥 米津玄師 英作文バトル 🔥</h1>
+
+    <div id="quiz-area">
+        <p>米津玄師の楽曲をテーマにした英作文クイズです。</p>
+        <p>準備ができたら、下のボタンを押して開始してください。</p>
+        <button id="start-button">クイズを開始する</button>
+    </div>
+    
+    <div id="result-area" style="display: none;">
+        <!-- 結果はここに表示されます -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const QUIZ_DATA = [
+                // [日本語ヒント, 問題文, 正解文]
+                ["(私は) 今 何を望むの？", "What does (I) hope for now?", "What do I hope for now?"], 
+                ["あなたが(彼を) 見つけたなら", "If you found (him).", "If you found him."], 
+                ["進もう、(僕らの) 魂の向かう先へ", "Let's go to (our) soul's destination.", "Let's go to our soul's destination."], 
+                ["これは(私のもの) ではない", "This is not (mine).", "This is not mine."], 
+                ["彼らに(彼ら)の全てを教えてやろう", "Let's teach (them) everything about them.", "Let's teach them everything about them."], 
+                ["誰も(私たち)を止められない", "No one can stop (us).", "No one can stop us."], 
+                ["(彼の) 歌が聞こえる", "(His) song is heard.", "His song is heard."], 
+                ["(私自身)ではどうすることもできない", "(I) cannot do anything by (myself).", "I cannot do anything by myself."], 
+                ["(彼女を) 孤独から救い出して", "Save (her) from loneliness.", "Save her from loneliness."], 
+                ["全てを焼き払い、(それ)を灰にしてしまえ", "Burn everything and turn (it) into ashes.", "Burn everything and turn it into ashes."], 
+            ];
+
+            const quizArea = document.getElementById('quiz-area');
+            const resultArea = document.getElementById('result-area');
+            const startButton = document.getElementById('start-button');
+            const backgroundMusic = document.getElementById('background-music');
+            const correctSound = document.getElementById('correct-sound');
+            const incorrectSound = document.getElementById('incorrect-sound');
+
+            let currentQuestionIndex = 0;
+            let score = 0;
+            let shuffledQuizData = [];
+
+            function normalizeAnswer(answer) {
+                return answer.toLowerCase().replace(/[\.,!\?]/g, '').trim().replace(/\s+/g, ' ');
+            }
+            
+            function displayQuestion() {
+                if (currentQuestionIndex < shuffledQuizData.length) {
+                    const currentQuiz = shuffledQuizData[currentQuestionIndex];
+                    const japaneseHint = currentQuiz[0];
+                    const englishTemplate = currentQuiz[1];
+                    
+                    quizArea.innerHTML = `
+                        <h2>Q${currentQuestionIndex + 1}/${shuffledQuizData.length}</h2>
+                        <p class="japanese-hint">ヒント: ${japaneseHint}</p>
+                        <p>ヒントを元に、全文を英訳してください。</p>
+                        <input type="text" id="answer-input" placeholder="ここに完成した英文を入力...">
+                        <button id="submit-button">解答する</button>
+                    `;
+
+                    document.getElementById('submit-button').addEventListener('click', checkAnswer);
+                    const answerInput = document.getElementById('answer-input');
+                    answerInput.addEventListener('keypress', (event) => {
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                            document.getElementById('submit-button').click();
+                        }
+                    });
+                    answerInput.focus();
+                } else {
+                    displayResult();
+                }
+            }
+
+            function checkAnswer() {
+                const userAnswer = document.getElementById('answer-input').value;
+                const currentQuiz = shuffledQuizData[currentQuestionIndex];
+                const correctAnswer = currentQuiz[2];
+
+                let resultText;
+                if (normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer)) {
+                    score++;
+                    correctSound.currentTime = 0;
+                    correctSound.play();
+                    resultText = `<p><span style="color: #00f0ff;">正解！</span></p>`;
+                } else {
+                    incorrectSound.currentTime = 0;
+                    incorrectSound.play();
+                    resultText = `<p><span style="color: #ff5555;">不正解...</span> 正解は「${correctAnswer}」</p>`;
+                }
+                
+                document.getElementById('submit-button').disabled = true;
+                quizArea.innerHTML += resultText;
+                
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    displayQuestion();
+                }, 2000);
+            }
+
+            function displayResult() {
+                quizArea.style.display = 'none';
+                resultArea.style.display = 'block';
+                resultArea.innerHTML = `
+                    <h2>最終結果</h2>
+                    <p>正解数: ${score} / ${shuffledQuizData.length}</p>
+                    <p>${score === shuffledQuizData.length ? '素晴らしい！全問正解です！' : 'お疲れ様でした！'}</p>
+                    <button onclick="location.reload()">もう一度挑戦する</button>
+                `;
+            }
+
+            function startQuiz() {
+                backgroundMusic.play().catch(error => console.log("BGMの自動再生がブロックされました。", error));
+                
+                shuffledQuizData = [...QUIZ_DATA].sort(() => Math.random() - 0.5);
+                currentQuestionIndex = 0;
+                score = 0;
+                
+                resultArea.style.display = 'none';
+                quizArea.style.display = 'block';
+                displayQuestion();
+            }
+
+            startButton.addEventListener('click', startQuiz);
+        });
+    </script>
+</body>
+</html>
