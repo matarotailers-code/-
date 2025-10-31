@@ -175,7 +175,7 @@
                 if (currentQuestionIndex < shuffledQuizData.length) {
                     const currentQuiz = shuffledQuizData[currentQuestionIndex];
                     const japaneseHint = currentQuiz[0];
-                    const englishTemplate = currentQuiz[1];
+                    // const englishTemplate = currentQuiz[1]; // テンプレートは表示しない
                     
                     quizArea.innerHTML = `
                         <h2>Q${currentQuestionIndex + 1}/${shuffledQuizData.length}</h2>
